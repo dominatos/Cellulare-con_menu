@@ -1,10 +1,11 @@
+import java.math.BigDecimal;
 import java.util.Scanner;
 import java.time.LocalDate;
 
 public class SIM {
 static Scanner sc=new Scanner(System.in);
 
-
+    public BigDecimal bdCredito;
     public String numero;
     public double credito=0;
     public Chiamata[] chiamate;
@@ -16,6 +17,8 @@ static Scanner sc=new Scanner(System.in);
         this.ric=false;
         this.numero = numero;
         this.credito = 0;
+        this.bdCredito= BigDecimal.valueOf(this.credito);
+        this.bdCredito=this.bdCredito.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.chiamate = new Chiamata[5];
         for (int i = 0; i < this.chiamate.length; i++) {
             this.chiamate[i] = new Chiamata(); // Создаем объект для каждой ячейки
@@ -26,15 +29,18 @@ static Scanner sc=new Scanner(System.in);
     }
 
     public void info() {
-        System.out.println("SIM: " + this.numero + " con credito: " + this.credito);
-        System.out.println("Credito: " + this.credito);
+        this.bdCredito= BigDecimal.valueOf(this.credito);
+        this.bdCredito=this.bdCredito.setScale(2, BigDecimal.ROUND_HALF_UP);
+        System.out.println("SIM: " + this.numero + "\nCredito: " + this.bdCredito);
+
+        //System.out.println("Credito: " + this.credito);
         System.out.println("Il prezzo pr minuta di chiamata : " + this.prmin);
         System.out.println("Lista di chiamati:");
         boolean nessunaChiamata = true;
 
 // Controlla se tutti gli elementi dell'array contengono "non e fatta la chiamata 0.0"
         for (int i = 0; i < this.chiamate.length; i++) {
-            if (chiamate[i] != null && !chiamate[i].stampchiamata().equals("non e fatta la chiamata 0.0")) {
+            if (chiamate[i] != null && !chiamate[i].stampchiamata().equals("Numero: non e fatta la chiamata Durata:0.00")) {
                 nessunaChiamata = false;
                 break; // Interrompe il ciclo appena troviamo almeno una chiamata effettuata
             }
@@ -46,8 +52,12 @@ static Scanner sc=new Scanner(System.in);
         } else {
             // In caso contrario, stampa l'elenco delle chiamate
             for (int i = 0; i < this.chiamate.length; i++) {
-                if (chiamate[i] != null && !chiamate[i].stampchiamata().equals("non e fatta la chiamata 0.0")) {
-                    System.out.println((i + 1) + " " + chiamate[i].stampchiamata());
+                if (chiamate[i] != null && !chiamate[i].stampchiamata().equals("Numero: non e fatta la chiamata Durata:0.00")) {
+                    BigDecimal prminBD=BigDecimal.valueOf(this.prmin);
+                    prminBD=prminBD.setScale(2, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal costoBD=prminBD.multiply(chiamate[i].durataBD);
+                    System.out.println((i + 1) + " " + chiamate[i].stampchiamata()+" Costo: "+costoBD);
+
                 }
             }
         }
@@ -76,6 +86,8 @@ static Scanner sc=new Scanner(System.in);
                  somma = Double.parseDouble(sc.nextLine());
 
                 this.credito=this.credito+somma;
+                this.bdCredito=BigDecimal.valueOf(this.credito);
+                this.bdCredito.setScale(2, BigDecimal.ROUND_HALF_UP);
                 this.ric=false;
                 info();
             }
@@ -143,7 +155,9 @@ static Scanner sc=new Scanner(System.in);
 
                     chiamate[0] = c; // Sovrascrive il primo elemento
                     // Opzionalmente, si può implementare una sovrascrittura ciclica tramite un indice
-                    acreditarechiamata(c);}
+                    acreditarechiamata(c);
+                    this.ric=false;
+                    }
                     else{
                         System.out.println("Non hai abbastanza credito per effeture la chiamata2");
 
@@ -151,9 +165,9 @@ static Scanner sc=new Scanner(System.in);
 
                     }
                 }
-                this.ric=true;
-                ricarica();
-                //info(); // Mostra le informazioni aggiornate
+                //this.ric=true;
+                //ricarica();
+                info(); // Mostra le informazioni aggiornate
             } else if (sinoval.equalsIgnoreCase("no")) {
                 info(); // Mostra semplicemente le informazioni attuali
             }else if (sinoval.equalsIgnoreCase("ricarica")) {
@@ -174,6 +188,8 @@ static Scanner sc=new Scanner(System.in);
     public void acreditarechiamata(Chiamata chiamata) {
 
         this.credito = this.credito - (chiamata.getDurata() * this.prmin);
+        this.bdCredito= BigDecimal.valueOf(this.credito);
+        this.bdCredito=this.bdCredito.setScale(2, BigDecimal.ROUND_HALF_UP);
         //System.out.println(this.credito);
 
     }
